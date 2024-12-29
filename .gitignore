@@ -10,6 +10,7 @@ staticfiles/
 
 # Virtual Environment
 ../blog_env/
+/venv/
 
 # IDEs and Editors
 .vscode/
