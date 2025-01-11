@@ -14,3 +14,15 @@ class Author(BaseModel):
     class Meta:
         verbose_name = 'Author'
         verbose_name_plural = 'Authors'
+        
+class Blog(BaseModel):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='blogs')
+
+    class Meta:
+        verbose_name = 'Post'
+        verbose_name_plural = 'Posts'
+        
+    def __str__(self):
+        return f'{self.author.user.username} - {self.title}'
