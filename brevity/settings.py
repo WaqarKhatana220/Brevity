@@ -31,20 +31,29 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+CORE_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+
+THIRD_PARTY_APPS = [
     'jet.dashboard',
     'jet',
-    
-    # custom apps
+    'rest_framework',
+    'rest_framework_simplejwt',
+]
+
+LOCAL_APPS = [
     'apps',
     'apps.users',
+    'apps.user_auth',
 ]
+
+INSTALLED_APPS = CORE_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -84,8 +93,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'brevity',
-        'USER': '',
-        'PASSWORD': '',
+        'USER': 'postgres',
+        'PASSWORD': 'root',
         'HOST': 'localhost',  # or '127.0.0.1'
         'PORT': '5432',  # default PostgreSQL port
     }
@@ -139,3 +148,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'statics')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 AUTH_USER_MODEL = 'users.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
