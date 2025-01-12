@@ -11,6 +11,8 @@ class BaseModel(models.Model):
         
 class Author(BaseModel):
     user = models.OneToOneField('users.User', on_delete=models.CASCADE, related_name='authors')
+    bio = models.TextField(blank=True)
+    linkedin_handle = models.URLField(blank=True, null=True)
 
     class Meta:
         verbose_name = 'Author'
