@@ -25,7 +25,6 @@ class BlogAdmin(admin.ModelAdmin):
         "state",
     )
     search_fields = (
-        "author",
         "state",
     )
     list_filter = (

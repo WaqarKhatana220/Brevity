@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import BlogCreateSerializer
-from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_404_NOT_FOUND, HTTP_200_OK
 from rest_framework.generics import ListAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import BlogListSerializer
@@ -51,3 +51,21 @@ class BlogListView(ListAPIView):
         user_obj = self.request.user
         author_obj = Author.objects.filter(user=user_obj).first()
         return Blog.objects.filter(author=author_obj)
+    
+class BlogDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def delete(self, request, blog_id, *args, **kwargs):
+        try:
+            user_obj = request.user
+            author_obj = Author.objects.filter(user=user_obj).first()
+            blog_obj = Blog.objects.get(id=blog_id)
+            
+            if not author_obj or blog_obj.author != author_obj:
+                return Response({'message': 'Blog does not belong to the user!'}, status=HTTP_400_BAD_REQUEST)
+            
+            blog_obj.delete()
+            return Response({'message': 'Blog deleted successfully!'}, status=HTTP_200_OK)
+        except Blog.DoesNotExist:
+            return Response({'message': 'Blog not found!'}, status=HTTP_404_NOT_FOUND)
+            
