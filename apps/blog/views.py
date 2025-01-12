@@ -114,7 +114,7 @@ class BlogPublishView(BaseBlogUpdateView):
             if blog_obj.state == Blog.STATE_PUBLISHED:
                 return Response({'message': 'Blog already published!'}, status=HTTP_400_BAD_REQUEST)
 
-            blog_obj.publish_blog()
+            blog_obj.publish_blog(request.user)
             blog_obj.save()
         except TransitionNotAllowed as e:
             logger.error(f'Blog with id {blog_id} cannot be published: {str(e)}')
@@ -132,7 +132,7 @@ class BlogEditView(BaseBlogUpdateView):
             return error_response
         
         try:
-            blog_obj.edit_blog()
+            blog_obj.edit_blog(request.user)
             blog_obj.save()
         except TransitionNotAllowed as e:
             logger.error(f'Blog with id {blog_id} cannot be edited: {str(e)}')
