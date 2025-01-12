@@ -31,3 +31,6 @@ class Blog(BaseModel, BlogWorkflow):
         
     def __str__(self):
         return f'{self.author} - {self.title[:25]}'
+    
+    def is_author(self, author):
+        return self.author == author
