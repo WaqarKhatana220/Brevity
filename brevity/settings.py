@@ -45,6 +45,7 @@ THIRD_PARTY_APPS = [
     'jet',
     'rest_framework',
     'rest_framework_simplejwt',
+    'django_fsm',
     'viewflow',
     'viewflow.workflow',
 ]
