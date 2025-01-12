@@ -60,4 +60,4 @@ class BlogChangeLog(models.Model):
         verbose_name_plural = 'Blog Change Logs'
         
     def __str__(self):
-        return f'{self.blog.title[:10]} - {self.changed_by}'
+        return f'{self.changed_by}-{self.blog.title[:10]}'
