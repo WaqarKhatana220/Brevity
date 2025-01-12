@@ -16,3 +16,12 @@ class BlogCreateSerializer(serializers.Serializer):
         if not value:
             raise serializers.ValidationError("Content is required.")
         return value
+    
+class BlogListSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField()
+    class Meta:
+        model = Blog
+        fields = ['author', 'title', 'content', 'state', 'created_at']
+        
+    def get_author(self, obj):
+        return obj.author.user.username

@@ -1,11 +1,14 @@
 import logging
 from .models import Author, Blog
-from apps.users.models import User
+from .filters import BlogListingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import BlogCreateSerializer
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
+from rest_framework.generics import ListAPIView
+from django_filters.rest_framework import DjangoFilterBackend
+from .serializers import BlogListSerializer
 
 logger = logging.getLogger('django')
 
@@ -37,3 +40,14 @@ class BlogCreateView(APIView):
 
         # Successfully created the blog
         return Response({'message': 'Blog created successfully!'}, status=HTTP_201_CREATED)
+    
+class BlogListView(ListAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = BlogListingFilter
+    serializer_class = BlogListSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        user_obj = self.request.user
+        author_obj = Author.objects.filter(user=user_obj).first()
+        return Blog.objects.filter(author=author_obj)
