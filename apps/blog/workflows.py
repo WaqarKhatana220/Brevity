@@ -5,7 +5,7 @@ from ..constants import DRAFT, PUBLISHED, EDITED, ARCHIVED
 
 logger = logging.getLogger('django')
 
-class PostWorkflow(models.Model):
+class BlogWorkflow(models.Model):
     STATE_DRAFT = DRAFT
     STATE_PUBLISHED = PUBLISHED
     STATE_EDITED = EDITED
