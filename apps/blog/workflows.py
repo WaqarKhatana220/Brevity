@@ -24,13 +24,30 @@ class BlogWorkflow(models.Model):
         abstract = True
     
     @transition(field=state, source=STATE_DRAFT, target=STATE_PUBLISHED)
-    def publish_blog(self):
+    def publish_blog(self, user):
+        self.create_change_log(self.state, self.STATE_PUBLISHED, user)
         logger.info(f'Blog post with id {self.id} has been published')
     
     @transition(field=state, source=[STATE_PUBLISHED, STATE_EDITED], target=STATE_EDITED)
-    def edit_blog(self):
+    def edit_blog(self, user):
+        self.create_change_log(self.state, self.STATE_EDITED, user)
         logger.info(f'Blog post with id {self.id} has been edited')
     
     @transition(field=state, source=[STATE_DRAFT, STATE_PUBLISHED, STATE_EDITED], target=STATE_ARCHIVED)
-    def archive_blog(self):
+    def archive_blog(self, user):
+        self.create_change_log(self.state, self.STATE_ARCHIVED, user)
         logger.info(f'Blog post with id {self.id} has been archived')
+        
+    def create_change_log(self, source, target, user):
+        from .models import BlogChangeLog
+        blog = BlogChangeLog.objects.create(
+            blog=self,
+            changed_by=user,
+            source=source,
+            target=target
+        )
+        
+        if blog:
+            logger.info(f'Blog change log with id {blog.id} has been created')
+        else:
+            logger.error('Failed to create blog change log')
