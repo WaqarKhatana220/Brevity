@@ -14,13 +14,13 @@ logger = logging.getLogger('django')
 
 class BlogCreateView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request, *args, **kwargs):
 
         serializer = BlogCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
-        
+
         try:
             user_obj = request.user
 
@@ -28,10 +28,9 @@ class BlogCreateView(APIView):
             if created:
                 logger.info(f'New author record created for user {user_obj.username}')
 
-
             Blog.objects.create(
-                title=validated_data.get('title'),
-                content=validated_data.get('content'),
+                title=validated_data.get("title"),
+                content=validated_data.get("content"),
                 author=author_obj
             )
         except Exception as e:
@@ -40,7 +39,7 @@ class BlogCreateView(APIView):
 
         # Successfully created the blog
         return Response({'message': 'Blog created successfully!'}, status=HTTP_201_CREATED)
-    
+
 class BlogListView(ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = BlogListingFilter
@@ -51,7 +50,7 @@ class BlogListView(ListAPIView):
         user_obj = self.request.user
         author_obj = Author.objects.filter(user=user_obj).first()
         return Blog.objects.filter(author=author_obj)
-    
+
 class BlogDeleteView(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -67,5 +66,66 @@ class BlogDeleteView(APIView):
             blog_obj.delete()
             return Response({'message': 'Blog deleted successfully!'}, status=HTTP_200_OK)
         except Blog.DoesNotExist:
+            logger.error(f'Blog with id {blog_id} not found')
             return Response({'message': 'Blog not found!'}, status=HTTP_404_NOT_FOUND)
+
+class BaseBlogUpdateView(APIView):
+    def post(self, request, blog_id, *args, **kwargs):
+
+        serializer = BlogCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+        
+        try:
+            user_obj = request.user
+            author_obj = Author.objects.get(user=user_obj)
             
+            blog_obj = Blog.objects.get(id=blog_id)
+            if blog_obj.author != author_obj:
+                raise Blog.DoesNotExist()
+
+            blog_obj.title = validated_data.get('title')
+            blog_obj.content = validated_data.get('content')
+            
+            return blog_obj
+
+        except Author.DoesNotExist:
+            logger.error(f'Author not found for user {user_obj.username}')
+            return Response({'message': 'User did not author this blog'}, status=HTTP_400_BAD_REQUEST)
+        except Blog.DoesNotExist:
+            logger.error(f'Blog with id {blog_id} not found')
+            return Response({'message': 'Blog not found!'}, status=HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error(f'An error occurred while creating blog: {e}')
+            return Response({'message': 'An error occurred!'}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class BlogPublishView(BaseBlogUpdateView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, blog_id, *args, **kwargs):
+        
+        blog_obj = super().post(request, blog_id)
+        try:
+            blog_obj.publish_blog()
+            blog_obj.save()
+        except Exception as e:
+            logger.error(f'An error occurred while publishing blog: {e}')
+            return Response({'message': 'An error occurred!'}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({'message': 'Blog published successfully!'}, status=HTTP_200_OK)
+
+class BlogEditView(BaseBlogUpdateView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, blog_id, *args, **kwargs):
+        
+        blog_obj = super().post(request, blog_id)
+        try:
+            blog_obj.edit_blog()
+            blog_obj.save()
+        except Exception as e:
+            logger.error(f'An error occurred while publishing blog: {e}')
+            return Response({'message': 'An error occurred!'}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({'message': 'Blog edited successfully!'}, status=HTTP_200_OK)

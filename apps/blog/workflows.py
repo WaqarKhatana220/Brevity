@@ -31,14 +31,14 @@ class BlogWorkflow(models.Model):
     @state_fsm.transition(source=STATE_DRAFT, target=STATE_PUBLISHED)
     def publish_blog(self):
         self.state = self.STATE_PUBLISHED
-        logger.info(f'Blog post has been published')
+        logger.info(f'Blog post with id {self.id} has been published')
     
-    @state_fsm.transition(source=STATE_PUBLISHED, target=STATE_EDITED)
+    @state_fsm.transition(source=[STATE_PUBLISHED, STATE_EDITED], target=STATE_EDITED)
     def edit_blog(self):
         self.state = self.STATE_EDITED
-        logger.info(f'Blog post has been edited')
+        logger.info(f'Blog post with id {self.id} has been edited')
     
     @state_fsm.transition(source=[STATE_DRAFT, STATE_PUBLISHED, STATE_EDITED], target=STATE_ARCHIVED)
     def archive_blog(self):
         self.state = self.STATE_ARCHIVED
-        logger.info(f'Blog post has been archived')
+        logger.info(f'Blog post with id {self.id} has been archived')
