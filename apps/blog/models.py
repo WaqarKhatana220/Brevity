@@ -17,14 +17,17 @@ class Author(BaseModel):
         verbose_name = 'Author'
         verbose_name_plural = 'Authors'
         
+    def __str__(self):
+        return f'{self.user}'
+        
 class Blog(BaseModel, BlogWorkflow):
     title = models.CharField(max_length=255)
     content = models.TextField()
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='blogs')
 
     class Meta:
-        verbose_name = 'Post'
-        verbose_name_plural = 'Posts'
+        verbose_name = 'Blog'
+        verbose_name_plural = 'Blogs'
         
     def __str__(self):
         return f'{self.author} - {self.title[:25]}'

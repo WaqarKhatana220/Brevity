@@ -18,10 +18,11 @@ class AuthorAdmin(admin.ModelAdmin):
 @admin.register(Blog)
 class BlogAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
         "author",
         "title",
-        "state",
         "content",
+        "state",
     )
     search_fields = (
         "author",
