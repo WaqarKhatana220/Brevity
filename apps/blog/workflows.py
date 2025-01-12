@@ -1,6 +1,6 @@
 import logging
 from django.db import models
-from django_fsm import transition, FSMField
+from viewflow.fsm import State
 from ..constants import DRAFT, PUBLISHED, EDITED, ARCHIVED
 
 logger = logging.getLogger('django')
@@ -14,22 +14,31 @@ class BlogWorkflow(models.Model):
     STATE_CHOICES = (
         (STATE_DRAFT, 'Draft'),
         (STATE_PUBLISHED, 'Published'),
+        (STATE_EDITED , 'Edited'),
         (STATE_ARCHIVED, 'Archived')
     )
     
-    state = FSMField(choices=STATE_CHOICES, default=STATE_DRAFT)
+    state = models.CharField(
+        max_length=50,
+        choices=STATE_CHOICES,
+        default=STATE_DRAFT
+    )
+    state_fsm = State(STATE_CHOICES, default=STATE_DRAFT)
     
     class Meta:
         abstract = True
     
-    @transition(field=state, source=STATE_DRAFT, target=STATE_PUBLISHED)
+    @state_fsm.transition(source=STATE_DRAFT, target=STATE_PUBLISHED)
     def publish_blog(self):
-        logger.info(f'Blog post {self.id} has been published')
+        self.state = self.STATE_PUBLISHED
+        logger.info(f'Blog post has been published')
     
-    @transition(field=state, source=STATE_PUBLISHED, target=STATE_EDITED)
+    @state_fsm.transition(source=STATE_PUBLISHED, target=STATE_EDITED)
     def edit_blog(self):
-        logger.info(f'Blog post {self.id} has been edited')
+        self.state = self.STATE_EDITED
+        logger.info(f'Blog post has been edited')
     
-    @transition(field=state, source=[STATE_DRAFT, STATE_PUBLISHED, STATE_EDITED], target=STATE_ARCHIVED)
+    @state_fsm.transition(source=[STATE_DRAFT, STATE_PUBLISHED, STATE_EDITED], target=STATE_ARCHIVED)
     def archive_blog(self):
-        logger.info(f'Blog post {self.id} has been archived')
+        self.state = self.STATE_ARCHIVED
+        logger.info(f'Blog post has been archived')
