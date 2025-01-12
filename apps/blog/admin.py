@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import Author, Blog
+from .workflows import BlogWorkflow
+from viewflow.fsm import FlowAdminMixin
 
 # Register your models here.
 
@@ -34,3 +36,4 @@ class BlogAdmin(admin.ModelAdmin):
     ordering = (
         "id",
     )
+
