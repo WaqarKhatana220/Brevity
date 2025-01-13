@@ -58,3 +58,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def name(self):
         return f"{self.username}"
+    
+    def get_subscribed_authors(self):
+        return self.subscribed_authors.all()
+    
+    def is_subscribed_to(self, author):
+        return self.subscribed_authors.filter(author=author).exists()
