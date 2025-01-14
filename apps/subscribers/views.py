@@ -87,6 +87,9 @@ class SubscriptionStatus(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, author_id, *args, **kwargs):
+        """
+        Checks if the user is subscribed to the author
+        """
         try:
             author = Author.objects.get(id=author_id)
             user = request.user
@@ -111,11 +114,23 @@ class SubscriptionStatus(APIView):
 
 
 class SubscribersListView(ListAPIView):
-    queryset = Subscribers.objects.all()
     serializer_class = SubscribersSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = SubscribersListingFilter
     permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        author_id = self.request.query_params.get('author_id', None)
+        if author_id:
+            return Subscribers.objects.filter(author__id=author_id)
+        return Subscribers.objects.none()
+    
+    def list(self, request, *args, **kwargs):
+        author_id = request.query_params.get('author_id', None)
+        if author_id and not Author.objects.filter(id=author_id).exists():
+            return Response(
+                {"message": "Author does not exist"},
+                status=HTTP_404_NOT_FOUND,
+            )
+        return super().list(request, *args, **kwargs)
 
 
 class SubscribedAuthorsView(ListAPIView):
@@ -124,4 +139,4 @@ class SubscribedAuthorsView(ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Subscribers.objects.filter(user=user)
+        return Subscribers.objects.filter(subscriber=user)

@@ -57,7 +57,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @property
     def name(self):
-        return f"{self.username}"
+        return f"{self.first_name} {self.last_name}" if self.first_name and self.last_name else self.username
     
     def get_subscribed_authors(self):
         return self.subscribed_authors.all()

@@ -11,4 +11,4 @@ class SubscribersListingFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(author__id=value)
         else:
-            return queryset
+            return queryset.objects.none()
