@@ -36,10 +36,13 @@ class SubscribeAuthorView(SubscriptionHandler, APIView):
             )
         except Author.DoesNotExist as e:
             logger.error(f"Author with id {author_id} does not exist.")
-            return Response({"message": str(e)}, status=HTTP_404_NOT_FOUND)
-        except (ValidationError, PermissionDenied) as e:
-            logger.error(f"An error occurred while subscribing to author: {e}")
-            return Response({"message": str(e)}, status=HTTP_400_BAD_REQUEST)
+            return Response({"message": "Author does not exist"}, status=HTTP_404_NOT_FOUND)
+        except PermissionDenied as e:
+            logger.error("Author cannot subscribe to self.")
+            return Response({"message": "Can not subscribe to self"}, status=HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            logger.error(f"User is already subscribed to the author with id {author_id}")
+            return Response({"message": "User is already subscribed to this author"}, status=HTTP_403_FORBIDDEN)
         except Exception as e:
             logger.error(
                 f"An unexpected error occurred while subscribing to author: {e}"
@@ -63,10 +66,10 @@ class UnSubscribeAuthorView(SubscriptionHandler, APIView):
             )
         except Author.DoesNotExist as e:
             logger.error(f"Author with id {author_id} does not exist.")
-            return Response({"message": str(e)}, status=HTTP_404_NOT_FOUND)
+            return Response({"message": "Author does not exist"}, status=HTTP_404_NOT_FOUND)
         except (ValidationError, PermissionDenied) as e:
             logger.error(f"An error occurred while unsubscribing from author: {e}")
-            return Response({"message": str(e)}, status=HTTP_400_BAD_REQUEST)
+            return Response({"message": "Invalid action"}, status=HTTP_400_BAD_REQUEST)
         except Exception as e:
             logger.error(
                 f"An unexpected error occurred while unsubscribing from author: {e}"

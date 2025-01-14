@@ -9,6 +9,8 @@ class Subscribers(models.Model):
     class Meta:
         unique_together = ('subscriber', 'author')
         ordering = ['-subscribed_at']
+        verbose_name = 'Subscribers'
+        verbose_name_plural = 'Subscribers'
 
     def __str__(self):
-        return f"{self.subscriber.username} follows {self.author.username}"
+        return f"{self.subscriber.username} follows {self.author.user.username}"
