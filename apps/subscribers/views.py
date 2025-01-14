@@ -67,9 +67,12 @@ class UnSubscribeAuthorView(SubscriptionHandler, APIView):
         except Author.DoesNotExist as e:
             logger.error(f"Author with id {author_id} does not exist.")
             return Response({"message": "Author does not exist"}, status=HTTP_404_NOT_FOUND)
-        except (ValidationError, PermissionDenied) as e:
-            logger.error(f"An error occurred while unsubscribing from author: {e}")
+        except PermissionDenied as e:
+            logger.error("Invalid action: author tried to unscribed from self")
             return Response({"message": "Invalid action"}, status=HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            logger.error(f"User is not subscribed to the author with id {author_id}")
+            return Response({"message": "User is not subscribed to this author"}, status=HTTP_403_FORBIDDEN)
         except Exception as e:
             logger.error(
                 f"An unexpected error occurred while unsubscribing from author: {e}"

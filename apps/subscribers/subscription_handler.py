@@ -18,10 +18,10 @@ class SubscriptionHandler:
     def validate_unsubscription(self, author_id, user):
         try:
             author = Author.objects.get(id=author_id)
-            if not author.is_subscribed_by(user):
-                raise ValidationError("User is not subscribed to this author.")
             if user == author.user:
                 raise PermissionDenied("Invalid action.")
+            if not author.is_subscribed_by(user):
+                raise ValidationError("User is not subscribed to this author.")
         except Author.DoesNotExist:
             raise Author.DoesNotExist("Author does not exist.")
         return author
