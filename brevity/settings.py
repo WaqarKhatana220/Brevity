@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from datetime import timedelta
 import os
 from pathlib import Path
 
@@ -54,7 +55,8 @@ LOCAL_APPS = [
     'apps',
     'apps.users',
     'apps.user_auth',
-    'apps.blog'
+    'apps.blog',
+    'apps.subscribers',
 ]
 
 INSTALLED_APPS = CORE_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -159,3 +161,14 @@ REST_FRAMEWORK = {
     ),
 }
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1), 
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY, 
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+}

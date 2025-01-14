@@ -35,6 +35,15 @@ class Author(BaseModel):
     
     def get_archived_blogs(self):
         return self.blogs.filter(state=BlogWorkflow.STATE_ARCHIVED)
+    
+    def is_subscribed_by(self, user):
+        return self.subscribers.filter(subscriber=user).exists()
+    
+    def get_subscribers(self):
+        return self.subscribers.all()
+    
+    def get_subscribers_count(self):
+        return self.subscribers.count()
 
         
 class Blog(BaseModel, BlogWorkflow):
