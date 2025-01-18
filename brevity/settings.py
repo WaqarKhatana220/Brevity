@@ -57,6 +57,7 @@ LOCAL_APPS = [
     'apps.user_auth',
     'apps.blog',
     'apps.subscribers',
+    'apps.comments',
 ]
 
 INSTALLED_APPS = CORE_APPS + THIRD_PARTY_APPS + LOCAL_APPS
